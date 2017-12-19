@@ -10,8 +10,8 @@ def weather_by_location():
 
     for l in config.locations:
         l['latlong'] = l['lat'] + ',' + l['long']
-        # r = requests.get(config.dark_sky['url'] + loc["latlong"]).json()
-        r = requests.get(config.dark_sky['url'] + l["latlong"] + ',1476428400').json() # -- Test Day with Rain
+        r = requests.get(config.dark_sky['url'] + loc["latlong"]).json()
+        # r = requests.get(config.dark_sky['url'] + l["latlong"] + ',1476428400').json() # -- Test Day with Rain
                 
         assert l['lat'] == str(r['latitude']), 'Result latitude {} too far from {}.'.format(r['latitude'], l['lat'])
         assert l['long'] == str(r['longitude']), 'Result longitude {} too far from {}.'.format(r['longitude'], l['long'])
@@ -86,51 +86,11 @@ def send_message(msg):
             body = msg
         )
 
-def other():
-    # Get weather data via API
-    for l in weather_by_location():
-        r = requests.get(config.dark_sky['url'] + loc["latlong"]).json()
-        # r = requests.get(config.dark_sky['url'] + loc["latlong"] + ',1476428400').json() # -- Test Day with Rain
-
-        with open('test.json','w') as f:
-            f.write(r.text)
-
-        loc["precip"] = float(r["daily"]["data"][0]["precipProbability"])
-        loc["start"] = ''
-        if loc["precip"] > 0.15:
-            for hour in r["hourly"]["data"]:
-                if float(hour['precipProbability']) >= loc["precip"]:
-                    loc["start"] = datetime.datetime.fromtimestamp(hour['time']).strftime('%I %p')
-                    break
-
-    # Find if there was rain for one of the locations
-    for loc in config.locations:
-        if loc["precip"] > 0:
-            smsTxt = rainMessage(config.locations)
-            break # Only need to do this once
-
-    # If rain, send the message!
-    try:
-        for toPhone in config.phoneList:
-            try:
-                config.client.messages.create(
-                    to=toPhone, 
-                    from_=config.fromPhone, 
-                    body=smsTxt
-                )
-            except Exception as e:
-                print('Argh!')
-                print(e)
-    except:
-        print('No Rain')
-
-
 
 if __name__ == '__main__':
+    ''' Gets weather data and sends a text message if there is rain '''
     rain_data = find_rain()
 
     if rain_data:
         msg = create_message(rain_data)
-        sent = send_message(msg)
-    
-    print('{}'.format(msg))
+        send_message(msg)
