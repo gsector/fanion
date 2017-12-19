@@ -10,7 +10,7 @@ def weather_by_location():
 
     for l in config.locations:
         l['latlong'] = l['lat'] + ',' + l['long']
-        r = requests.get(config.dark_sky['url'] + loc["latlong"]).json()
+        r = requests.get(config.dark_sky['url'] + l["latlong"]).json()
         # r = requests.get(config.dark_sky['url'] + l["latlong"] + ',1476428400').json() # -- Test Day with Rain
                 
         assert l['lat'] == str(r['latitude']), 'Result latitude {} too far from {}.'.format(r['latitude'], l['lat'])
