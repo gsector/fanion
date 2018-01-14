@@ -3,10 +3,7 @@ import json
 import datetime
 import config
 
-try:
-    from twilio.rest import TwilioRestClient as Client
-except:
-    from twilio.rest import Client
+from twilio.rest import Client
 
 
 def weather_by_location():
