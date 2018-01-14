@@ -1,8 +1,12 @@
 import requests
 import json
 import datetime
-from twilio.rest import TwilioRestClient
 import config
+
+try:
+    from twilio.rest import TwilioRestClient as Client
+except:
+    from twilio.rest import Client
 
 
 def weather_by_location():
@@ -78,7 +82,7 @@ def create_message(rain_data):
 def send_message(msg):
     ''' Send text message with data from msg '''
     # If rain, send the message!
-    twilio_client = TwilioRestClient(config.twilio['ACCOUNT_SID'], config.twilio['AUTH_TOKEN'])
+    twilio_client = Client(config.twilio['ACCOUNT_SID'], config.twilio['AUTH_TOKEN'])
     for to in config.recipients:
         twilio_message = twilio_client.messages.create(
             to = to, 
